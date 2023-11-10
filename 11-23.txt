@@ -1,0 +1,20 @@
+Earning: 100000
+Location: rust course 
+Amt: 5431
+Why: felt like
+End
+Location: rust course 
+Amt: 5432
+Why: felt like
+End
+Location: rust course 
+Amt: 5433
+Why: felt like
+End
+Location: rust course 
+Amt: 5434
+Why: felt like
+End
+Saving: 1000
+OverSpent: 0
+Thought: everything went as planned
