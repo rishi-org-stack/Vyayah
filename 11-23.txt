@@ -17,4 +17,4 @@ Why: felt like
 End
 Saving: 1000
 OverSpent: 0
-Thought: everything went as planned
+Thought: everything went as plannedEarning:100000
