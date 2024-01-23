@@ -1,7 +1,9 @@
+use serde::{Deserialize, Serialize};
 //category defines in which type trnsactions belongs.
 //personal: money spent on things that are personal items,
 //mandatory: money spend on items that are mandatory,
 //Income: money earned
+#[derive(Serialize, Deserialize, Debug)]
 enum Category {
     Personal,
     Mandatory,
@@ -9,6 +11,7 @@ enum Category {
     Income,
 }
 
+#[derive(Serialize, Deserialize, Debug)]
 //Account is bucket to keep accounting of transcation
 struct Account {
     id: AccountID,
@@ -18,6 +21,7 @@ struct Account {
     transaction: Option<Vec<TransactionID>>,
 }
 
+#[derive(Serialize, Deserialize, Debug)]
 //different types of account
 enum AccountType {
     Saving,
@@ -25,16 +29,26 @@ enum AccountType {
     Active,
 }
 
+#[derive(Serialize, Deserialize, Debug)]
 //transaction could be debit(-) or credit(+) in account
 enum TransactionType {
     Debit,
     Credit,
 }
 
+#[derive(Serialize, Deserialize, Debug)]
+//self explaintory
+struct Amount {
+    principal: f64,
+    final_amt: f64,
+    taxes: Vec<f64>,
+}
+
 //unique id type for transaction and account
 type AccountID = String;
 type TransactionID = String;
 
+#[derive(Serialize, Deserialize, Debug)]
 //smallest unit of management what spent or earned from where
 struct Transaction {
     id: TransactionID,
@@ -49,11 +63,4 @@ struct Transaction {
     description: String,
     // refrence other transaction in case of refunds, refusals etc.
     refrence: Option<TransactionID>,
-}
-
-//self explaintory
-struct Amount {
-    principal: f64,
-    final_amt: f64,
-    taxes: Vec<f64>,
 }
