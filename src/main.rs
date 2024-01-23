@@ -150,6 +150,10 @@ fn main() {
 
             _ => unreachable!(),
         },
+        Some(("describe", command)) => {
+            let unit = command.get_one::<String>("UNIT").unwrap();
+            println!("describe unit={}", unit)
+        }
         _ => unreachable!(),
     }
 }
