@@ -1,39 +1,8 @@
-// use std::{fs::File, error::Error};
-// pub mod expense;
-// struct Connection<'a> {
-//     data: Vec<&'a str>,
-// }
-
-// #[derive(Debug)]
-// struct ErrFileNotFound{
-//     msg: String,
-// }
-// impl Error for ErrFileNotFound{
-
-// }
-
-// impl ErrFileNotFound{
-//     fn Display(){
-
-//     }
-// }
-// struct ErrorConnection{
-
-// }
-
-// impl<'a> Connection<'a> {
-//     fn new(file_path: &str) -> Connection<'a> {
-//         if let File::open(file_path);
-//     }
-// }
-
-// fn main() {
-
-// }
 pub mod cli;
+pub mod id;
+pub mod model;
 use clap::{Arg, ArgAction, ArgMatches, Command};
 use cli::input;
-use serde::de;
 fn handle_acc(subcmd: &ArgMatches) {
     match subcmd.subcommand() {
         Some(("add", commands)) => {
@@ -95,42 +64,53 @@ fn handle_acc(subcmd: &ArgMatches) {
     }
 }
 
-fn handle_txn(cmd: &ArgMatches) {
-    let txn_type = cmd.get_one::<String>("TYPE").unwrap();
+fn handle_txn(subcmds: &ArgMatches) {
+    match subcmds.subcommand() {
+        Some(("refund", cmd)) => {
+            let name = cmd.get_one::<String>("name").expect("name is required");
+            let id = cmd.get_one::<String>("id").expect("tx. id is required");
+            println!("{:#?}", name);
+            println!("{:#?}", id);
+        }
+        Some(("new", cmd)) => {
+            let txn_type = cmd.get_one::<String>("TYPE").unwrap();
 
-    let name = cmd.get_one::<String>("name").expect("name is required");
+            let name = cmd.get_one::<String>("name").expect("name is required");
 
-    let def_amount = "2".to_string();
+            let def_amount = "2".to_string();
 
-    let amount = cmd
-        .get_one::<String>("amount")
-        .unwrap_or(&def_amount)
-        .parse::<u64>()
-        .expect("value of txn");
+            let amount = cmd
+                .get_one::<String>("amount")
+                .unwrap_or(&def_amount)
+                .parse::<u64>()
+                .expect("value of txn");
 
-    let category = cmd
-        .get_one::<String>("category")
-        .expect("category is required to group transaction");
+            let category = cmd
+                .get_one::<String>("category")
+                .expect("category is required to group transaction");
 
-    let default_info = "".to_string();
-    let information = cmd
-        .get_one::<String>("information")
-        .unwrap_or(&default_info);
+            let default_info = "".to_string();
+            let information = cmd
+                .get_one::<String>("information")
+                .unwrap_or(&default_info);
 
-    let mut taxes_nums: Vec<u64> = Vec::new();
+            let mut taxes_nums: Vec<u64> = Vec::new();
 
-    if let Some(taxes_str) = cmd.get_many::<String>("taxes") {
-        taxes_nums = taxes_str
-            .map(|s| s.parse::<u64>().expect("only num"))
-            .collect();
+            if let Some(taxes_str) = cmd.get_many::<String>("taxes") {
+                taxes_nums = taxes_str
+                    .map(|s| s.parse::<u64>().expect("only num"))
+                    .collect();
+            }
+
+            println!("{:#?}", txn_type);
+            println!("{:#?}", name);
+            println!("{:#?}", amount);
+            println!("{:#?}", category);
+            println!("{:#?}", information);
+            println!("{:#?}", taxes_nums)
+        }
+        _ => unreachable!(),
     }
-
-    println!("{:#?}", txn_type);
-    println!("{:#?}", name);
-    println!("{:#?}", amount);
-    println!("{:#?}", category);
-    println!("{:#?}", information);
-    println!("{:#?}", taxes_nums)
 }
 
 fn handle_describe(cmd: &ArgMatches) {
@@ -139,58 +119,6 @@ fn handle_describe(cmd: &ArgMatches) {
 }
 
 fn main() {
-    // let matches = Command::new("pacman")
-    //     .about("package manager utility")
-    //     .version("5.2.1")
-    //     .subcommand_required(true)
-    //     .arg_required_else_help(true)
-    //     // Query subcommand
-    //     //
-    //     // Only a few of its arguments are implemented below.
-    //     .subcommand(
-    //         Command::new("query")
-    //             .short_flag('Q')
-    //             .long_flag("query")
-    //             .about("Query the package database.")
-    //             .arg(
-    //                 Arg::new("search")
-    //                     .short('s')
-    //                     .long("search")
-    //                     .help("search locally installed packages for matching strings")
-    //                     .conflicts_with("info")
-    //                     .action(ArgAction::Set)
-    //                     .num_args(1),
-    //             )
-    //             .arg(
-    //                 Arg::new("info")
-    //                     .long("info")
-    //                     .short('i')
-    //                     .conflicts_with("search")
-    //                     .help("view package information")
-    //                     .action(ArgAction::Set)
-    //                     .num_args(1),
-    //             ),
-    //     )
-    //     // Sync subcommand
-    //     //
-    //     // Only a few of its arguments are implemented below.
-    //     .get_matches();
-
-    // match matches.subcommand() {
-    //     Some(("query", query_matches)) => {
-    //         if let Some(packages) = query_matches.get_many::<String>("info") {
-    //             let comma_sep = packages.map(|s| s.as_str()).collect::<Vec<_>>().join(", ");
-    //             println!("Retrieving info for {comma_sep}...");
-    //         } else if let Some(queries) = query_matches.get_many::<String>("search") {
-    //             let comma_sep = queries.map(|s| s.as_str()).collect::<Vec<_>>().join(", ");
-    //             println!("Searching Locally for {comma_sep}...");
-    //         } else {
-    //             println!("Displaying all locally installed packages...");
-    //         }
-    //     }
-    //     _ => unreachable!(), // If all subcommands are defined above, anything else is unreachable
-    // }
-
     let input = input().get_matches();
 
     match input.subcommand() {

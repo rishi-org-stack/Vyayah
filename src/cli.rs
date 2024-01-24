@@ -10,8 +10,8 @@
 // findctl txn --name=<name> debit  --amt=<amount> --tax=1,2,3 --type=
 // <category of txn> --info=<description>
 
-// findctl txn --name=<name> refund --amt=<amount> <txn_identifier>
-use clap::{arg, Arg, Command};
+// findctl txn --name=<name> refund  <txn_identifier>
+use clap::{arg, command, Arg, Command};
 
 pub fn input() -> Command {
     Command::new("finctl")
@@ -52,11 +52,20 @@ pub fn input() -> Command {
         .subcommand(
             Command::new("txn")
                 .about("transaction operations")
-                .arg(arg!(<TYPE> "type"))
-                .arg(Arg::new("name").short('n').long("name"))
-                .arg(Arg::new("amount").long("amt"))
-                .arg(Arg::new("category").long("kind"))
-                .arg(Arg::new("information").long("info"))
-                .arg(Arg::new("taxes").long("tax").num_args(1..)),
+                .subcommand(
+                    Command::new("refund")
+                        .arg(Arg::new("refund"))
+                        .arg(Arg::new("name").short('n').long("name"))
+                        .arg(Arg::new("id").long("id")),
+                )
+                .subcommand(
+                    Command::new("new")
+                        .arg(arg!(<TYPE> "type"))
+                        .arg(Arg::new("name").short('n').long("name"))
+                        .arg(Arg::new("amount").long("amt"))
+                        .arg(Arg::new("category").long("kind"))
+                        .arg(Arg::new("information").long("info"))
+                        .arg(Arg::new("taxes").long("tax").num_args(1..)),
+                ),
         )
 }
