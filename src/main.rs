@@ -5,7 +5,11 @@ pub mod id;
 pub mod model;
 use clap::ArgMatches;
 use cli::input;
-fn handle_acc(subcmd: &ArgMatches) {
+use sled::{Config, Db};
+use std::io::Read;
+
+use crate::{db::AccountDB, model::Account};
+fn handle_acc(subcmd: &ArgMatches, db: AccountDB) {
     match subcmd.subcommand() {
         Some(("add", commands)) => {
             let name = commands
@@ -26,7 +30,15 @@ fn handle_acc(subcmd: &ArgMatches) {
             println!(
                 "add account requested with name={} type={} initial balance={}",
                 name, acc_type, initial_balance
-            )
+            );
+
+            let account = Account::new(name.clone(), acc_type.clone(), Some(initial_balance))
+                .expect("failed to create account");
+
+            db.insert(&account.id, &account)
+                .expect("failed to create account");
+
+            println!("account_id: {}", account.id)
         }
         Some(("del", commands)) => {
             let name = commands
@@ -60,7 +72,10 @@ fn handle_acc(subcmd: &ArgMatches) {
             println!(
                 "satement of account with name={}, tail={}, head={}",
                 name, tail_len, head_len
-            )
+            );
+
+            let acc = db.get("F78F".to_string()).expect("failed get");
+            println!("account: {:#?}", acc)
         }
         _ => unreachable!(),
     }
@@ -123,10 +138,23 @@ fn handle_describe(cmd: &ArgMatches) {
 fn main() {
     let input = input().get_matches();
 
-    match input.subcommand() {
-        Some(("acc", subcommand)) => handle_acc(subcommand),
-        Some(("txn", commands)) => handle_txn(commands),
-        Some(("describe", command)) => handle_describe(command),
-        _ => unreachable!(),
-    }
+    let db = Config::new()
+        .path("./ok")
+        .open()
+        .expect("failed to create db");
+
+    // let acc_db = AccountDB::new(db);
+    // match input.subcommand() {
+    //     Some(("acc", subcommand)) => handle_acc(subcommand, acc_db),
+    //     Some(("txn", commands)) => handle_txn(commands),
+    //     Some(("describe", command)) => handle_describe(command),
+    //     _ => unreachable!(),
+    // }
+
+    db.insert("key", "v").expect("msg");
+    let v = db.get("key").unwrap().unwrap();
+
+    let b = v.bytes().map(|bt| bt.unwrap()).collect();
+    let account_body = String::from_utf8(b).unwrap();
+    println!("{}", account_body)
 }

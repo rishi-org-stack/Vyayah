@@ -28,14 +28,14 @@ fn generate_id(pass_len: usize) -> String {
 
 #[derive(Serialize, Deserialize, Debug)]
 //different types of account
-enum AccountType {
+pub enum AccountType {
     Saving,
     Emi,
     Active,
 }
 
 impl AccountType {
-    fn from_str(str: &str) -> Result<AccountType, String> {
+    pub fn from_str(str: &str) -> Result<AccountType, String> {
         match str {
             "saving" => Ok(AccountType::Saving),
             "emi" => Ok(AccountType::Emi),
@@ -47,8 +47,8 @@ impl AccountType {
 
 #[derive(Serialize, Deserialize, Debug)]
 //Account is bucket to keep accounting of transcation
-struct Account {
-    id: AccountID,
+pub struct Account {
+    pub id: AccountID,
     name: String,
     account_type: AccountType,
     balance: f64,
@@ -58,14 +58,14 @@ struct Account {
 }
 
 impl Account {
-    fn encode(&self) -> Result<String, String> {
+    pub fn encode(&self) -> Result<String, String> {
         match serde_json::to_string(self) {
             Ok(v) => return Ok(v),
             Err(e) => return Err(e.to_string()),
         }
     }
 
-    fn decode(raw: String) -> Result<Self, String> {
+    pub fn decode(raw: String) -> Result<Self, String> {
         let acc: Account = match serde_json::from_str(raw.as_str()) {
             Ok(v) => v,
             Err(e) => return Err(e.to_string()),
@@ -76,14 +76,14 @@ impl Account {
     pub fn new(
         name: String,
         account_type: String,
-        initial_balance: Option<f64>,
+        initial_balance: Option<u64>,
     ) -> Result<Account, String> {
         let acc_type = match AccountType::from_str(account_type.as_str()) {
             Ok(acc_t) => acc_t,
             Err(e) => return Err(e),
         };
 
-        let init_balance = initial_balance.unwrap_or(0 as f64);
+        let init_balance = initial_balance.unwrap_or(0);
         let created_on = SystemTime::now()
             .duration_since(SystemTime::UNIX_EPOCH)
             .unwrap()
@@ -93,7 +93,7 @@ impl Account {
             id: new_acc_id(),
             name,
             account_type: acc_type,
-            balance: init_balance,
+            balance: init_balance as f64,
             created_on: created_on,
             transactions: None,
             snapshots: None,
@@ -106,7 +106,7 @@ impl Account {
 //mandatory: money spend on items that are mandatory,
 //Income: money earned
 #[derive(Serialize, Deserialize, Debug)]
-enum Category {
+pub enum Category {
     Personal,
     Mandatory,
     Emi,
@@ -114,7 +114,7 @@ enum Category {
 }
 
 impl Category {
-    fn to_string(&self) -> String {
+    pub fn to_string(&self) -> String {
         match self {
             Category::Personal => return "personal".to_string(),
             Category::Mandatory => return "mandatory".to_string(),
@@ -123,7 +123,7 @@ impl Category {
         }
     }
 
-    fn from_str(str: &str) -> Result<Category, String> {
+    pub fn from_str(str: &str) -> Result<Category, String> {
         match str {
             "personal" => Ok(Category::Personal),
             "mandatory" => Ok(Category::Mandatory),
@@ -136,20 +136,20 @@ impl Category {
 
 #[derive(Serialize, Deserialize, Debug)]
 //transaction could be debit(-) or credit(+) in account
-enum TransactionType {
+pub enum TransactionType {
     Debit,
     Credit,
 }
 
 impl TransactionType {
-    fn to_string(&self) -> String {
+    pub fn to_string(&self) -> String {
         match self {
             TransactionType::Debit => return "debit".to_string(),
             TransactionType::Credit => return "credit".to_string(),
         }
     }
 
-    fn from_str(str: &str) -> Result<TransactionType, String> {
+    pub fn from_str(str: &str) -> Result<TransactionType, String> {
         match str {
             "debit" => Ok(TransactionType::Debit),
             "credit" => Ok(TransactionType::Credit),
@@ -160,21 +160,21 @@ impl TransactionType {
 
 #[derive(Serialize, Deserialize, Debug)]
 //self explaintory
-struct Amount {
+pub struct Amount {
     principal: f64,
     final_amt: f64,
     taxes: Vec<f64>,
 }
 
 impl Amount {
-    fn encode(&self) -> Result<String, String> {
+    pub fn encode(&self) -> Result<String, String> {
         match serde_json::to_string(self) {
             Ok(v) => return Ok(v),
             Err(e) => return Err(e.to_string()),
         }
     }
 
-    fn decode(raw: String) -> Result<Self, String> {
+    pub fn decode(raw: String) -> Result<Self, String> {
         let amt: Amount = match serde_json::from_str(raw.as_str()) {
             Ok(v) => v,
             Err(e) => return Err(e.to_string()),
@@ -199,7 +199,7 @@ type SnapshotID = String;
 
 #[derive(Serialize, Deserialize, Debug)]
 //smallest unit of management what spent or earned from where
-struct Transaction {
+pub struct Transaction {
     id: TransactionID,
     source: AccountID,
     //credit or debit
@@ -216,21 +216,21 @@ struct Transaction {
 }
 
 impl Transaction {
-    fn encode(&self) -> Result<String, String> {
+    pub fn encode(&self) -> Result<String, String> {
         match serde_json::to_string(self) {
             Ok(v) => return Ok(v),
             Err(e) => return Err(e.to_string()),
         }
     }
 
-    fn decode(raw: String) -> Result<Self, String> {
+    pub fn decode(raw: String) -> Result<Self, String> {
         let txn: Transaction = match serde_json::from_str(raw.as_str()) {
             Ok(v) => v,
             Err(e) => return Err(e.to_string()),
         };
         Ok(txn)
     }
-    fn new(
+    pub fn new(
         source: AccountID,
         tansaction_type_str: &str,
         category_str: &str,
@@ -271,28 +271,28 @@ impl Transaction {
 
 #[derive(Serialize, Deserialize, Debug)]
 //Account is bucket to keep accounting of transcation
-struct AccountSnapshot {
+pub struct AccountSnapshot {
     id: SnapshotID,
     balance: f64,
     transaction_id: TransactionID,
 }
 
 impl AccountSnapshot {
-    fn encode(&self) -> Result<String, String> {
+    pub fn encode(&self) -> Result<String, String> {
         match serde_json::to_string(self) {
             Ok(v) => return Ok(v),
             Err(e) => return Err(e.to_string()),
         }
     }
 
-    fn decode(raw: String) -> Result<Self, String> {
-        let accSnap: AccountSnapshot = match serde_json::from_str(raw.as_str()) {
+    pub fn decode(raw: String) -> Result<Self, String> {
+        let acc_snap: AccountSnapshot = match serde_json::from_str(raw.as_str()) {
             Ok(v) => v,
             Err(e) => return Err(e.to_string()),
         };
-        Ok(accSnap)
+        Ok(acc_snap)
     }
-    fn new(acc_id: String, balance: f64, transaction_id: String) -> AccountSnapshot {
+    pub fn new(acc_id: String, balance: f64, transaction_id: String) -> AccountSnapshot {
         let id = new_trx_id(acc_id.as_str());
         AccountSnapshot {
             id,
