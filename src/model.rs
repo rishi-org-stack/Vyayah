@@ -1,10 +1,10 @@
-use std::time::SystemTime;
-
 use rand::{thread_rng, Rng};
 use serde::{Deserialize, Serialize};
+use std::time::SystemTime;
 
-fn new_trx_id() -> String {
-    generate_id(10 as usize)
+fn new_trx_id(acc: &str) -> String {
+    let gen_id = generate_id(4 as usize);
+    format!("{}_{}", acc, gen_id)
 }
 
 fn new_acc_id() -> String {
@@ -58,6 +58,21 @@ struct Account {
 }
 
 impl Account {
+    fn encode(&self) -> Result<String, String> {
+        match serde_json::to_string(self) {
+            Ok(v) => return Ok(v),
+            Err(e) => return Err(e.to_string()),
+        }
+    }
+
+    fn decode(raw: String) -> Result<Self, String> {
+        let acc: Account = match serde_json::from_str(raw.as_str()) {
+            Ok(v) => v,
+            Err(e) => return Err(e.to_string()),
+        };
+        Ok(acc)
+    }
+
     pub fn new(
         name: String,
         account_type: String,
@@ -94,16 +109,25 @@ impl Account {
 enum Category {
     Personal,
     Mandatory,
-    Scheduled,
+    Emi,
     Income,
 }
 
 impl Category {
+    fn to_string(&self) -> String {
+        match self {
+            Category::Personal => return "personal".to_string(),
+            Category::Mandatory => return "mandatory".to_string(),
+            Category::Emi => return "emi".to_string(),
+            Category::Income => return "income".to_string(),
+        }
+    }
+
     fn from_str(str: &str) -> Result<Category, String> {
         match str {
             "personal" => Ok(Category::Personal),
             "mandatory" => Ok(Category::Mandatory),
-            "schedule" => Ok(Category::Scheduled),
+            "schedule" => Ok(Category::Emi),
             "income" => Ok(Category::Income),
             _ => return Err(String::from("not a valid category type")),
         }
@@ -118,6 +142,13 @@ enum TransactionType {
 }
 
 impl TransactionType {
+    fn to_string(&self) -> String {
+        match self {
+            TransactionType::Debit => return "debit".to_string(),
+            TransactionType::Credit => return "credit".to_string(),
+        }
+    }
+
     fn from_str(str: &str) -> Result<TransactionType, String> {
         match str {
             "debit" => Ok(TransactionType::Debit),
@@ -136,7 +167,22 @@ struct Amount {
 }
 
 impl Amount {
-    fn from_str(principal: f64, taxes: Vec<f64>) -> Amount {
+    fn encode(&self) -> Result<String, String> {
+        match serde_json::to_string(self) {
+            Ok(v) => return Ok(v),
+            Err(e) => return Err(e.to_string()),
+        }
+    }
+
+    fn decode(raw: String) -> Result<Self, String> {
+        let amt: Amount = match serde_json::from_str(raw.as_str()) {
+            Ok(v) => v,
+            Err(e) => return Err(e.to_string()),
+        };
+        Ok(amt)
+    }
+
+    fn new(principal: f64, taxes: Vec<f64>) -> Amount {
         let total_tax = taxes.iter().fold(0 as f64, |acc, v| acc + v);
         Amount {
             principal,
@@ -170,6 +216,20 @@ struct Transaction {
 }
 
 impl Transaction {
+    fn encode(&self) -> Result<String, String> {
+        match serde_json::to_string(self) {
+            Ok(v) => return Ok(v),
+            Err(e) => return Err(e.to_string()),
+        }
+    }
+
+    fn decode(raw: String) -> Result<Self, String> {
+        let txn: Transaction = match serde_json::from_str(raw.as_str()) {
+            Ok(v) => v,
+            Err(e) => return Err(e.to_string()),
+        };
+        Ok(txn)
+    }
     fn new(
         source: AccountID,
         tansaction_type_str: &str,
@@ -179,7 +239,7 @@ impl Transaction {
         principal: f64,
         taxes: Vec<f64>,
     ) -> Result<Transaction, String> {
-        let id = new_trx_id();
+        let id = new_trx_id(source.as_str());
         let category = match Category::from_str(category_str) {
             Ok(c) => c,
             Err(e) => return Err(e),
@@ -198,7 +258,7 @@ impl Transaction {
         Ok(Transaction {
             id,
             source,
-            amount: Amount::from_str(principal, taxes),
+            amount: Amount::new(principal, taxes),
             category,
             description,
             created_on,
@@ -218,8 +278,22 @@ struct AccountSnapshot {
 }
 
 impl AccountSnapshot {
-    fn new(balance: f64, transaction_id: String) -> AccountSnapshot {
-        let id = new_trx_id();
+    fn encode(&self) -> Result<String, String> {
+        match serde_json::to_string(self) {
+            Ok(v) => return Ok(v),
+            Err(e) => return Err(e.to_string()),
+        }
+    }
+
+    fn decode(raw: String) -> Result<Self, String> {
+        let accSnap: AccountSnapshot = match serde_json::from_str(raw.as_str()) {
+            Ok(v) => v,
+            Err(e) => return Err(e.to_string()),
+        };
+        Ok(accSnap)
+    }
+    fn new(acc_id: String, balance: f64, transaction_id: String) -> AccountSnapshot {
+        let id = new_trx_id(acc_id.as_str());
         AccountSnapshot {
             id,
             balance,
