@@ -1,8 +1,11 @@
+pub mod api;
 pub mod cli;
 pub mod db;
 pub mod handler;
 pub mod id;
 pub mod model;
+pub mod service;
+use api::api;
 use clap::ArgMatches;
 use cli::input;
 use sled::{Config, Db};
@@ -135,14 +138,21 @@ fn handle_describe(cmd: &ArgMatches) {
     println!("describe unit={}", unit)
 }
 
-fn main() {
-    let input = input().get_matches();
+#[tokio::main]
+async fn main() {
+    // let input = input().get_matches();
 
-    let db = Config::new()
-        .path("./ok")
-        .open()
-        .expect("failed to create db");
-
+    // let db = Config::new()
+    //     .path("./ok")
+    //     .open()
+    //     .expect("failed to create db");
+    // let config = sled::Config::default()
+    //     .path("./store/ok".to_owned())
+    //     .cache_capacity(10_000_000_000)
+    //     .flush_every_ms(Some(1000));
+    // let db = sled::open("./ok").unwrap();
+    // sled::MergeOperator
+    // let db = config.open().unwrap();
     // let acc_db = AccountDB::new(db);
     // match input.subcommand() {
     //     Some(("acc", subcommand)) => handle_acc(subcommand, acc_db),
@@ -151,10 +161,12 @@ fn main() {
     //     _ => unreachable!(),
     // }
 
-    db.insert("key", "v").expect("msg");
-    let v = db.get("key").unwrap().unwrap();
+    // db.insert("key", "v").expect("msg");
+    // let v = db.get("key").unwrap().unwrap();
 
-    let b = v.bytes().map(|bt| bt.unwrap()).collect();
-    let account_body = String::from_utf8(b).unwrap();
-    println!("{}", account_body)
+    // let b = v.bytes().map(|bt| bt.unwrap()).collect();
+    // let account_body = String::from_utf8(b).unwrap();
+    // println!("{}", account_body)
+
+    api();
 }
