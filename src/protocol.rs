@@ -214,5 +214,72 @@ mod tests {
         assert_eq!(same_entity_type, true);
         assert_eq!(function.size, 13);
         assert_eq!(function.buffer, "somencodedstr".as_bytes().to_vec());
+
+        // Delete account
+        let raw = "-acc\r\n13\r\nsomencodedstr\r\n";
+        let function = Function::parse(raw.as_bytes().to_vec()).unwrap();
+        let same_fn_type = match function.function {
+            FunctionTypes::Delete => true,
+            _ => false,
+        };
+        assert_eq!(same_fn_type, true);
+
+        let same_entity_type = match function.entity {
+            EntityTypes::ACC => true,
+            _ => false,
+        };
+
+        assert_eq!(same_entity_type, true);
+
+        // Describe account
+        let raw = "$acc\r\n13\r\nsomencodedstr\r\n";
+        let function = Function::parse(raw.as_bytes().to_vec()).unwrap();
+        let same_fn_type = match function.function {
+            FunctionTypes::Describe => true,
+            _ => false,
+        };
+        assert_eq!(same_fn_type, true);
+
+        let same_entity_type = match function.entity {
+            EntityTypes::ACC => true,
+            _ => false,
+        };
+
+        assert_eq!(same_entity_type, true);
+    }
+    #[test]
+    fn check_function_parse_txn() {
+        let raw = "+txn\r\n13\r\nsomencodedstr\r\n";
+        let function = Function::parse(raw.as_bytes().to_vec()).unwrap();
+        let same_fn_type = match function.function {
+            FunctionTypes::Add => true,
+            _ => false,
+        };
+        assert_eq!(same_fn_type, true);
+
+        let same_entity_type = match function.entity {
+            EntityTypes::TXN => true,
+            _ => false,
+        };
+
+        assert_eq!(same_entity_type, true);
+        assert_eq!(function.size, 13);
+        assert_eq!(function.buffer, "somencodedstr".as_bytes().to_vec());
+
+        // Describe transaction
+        let raw = "$txn\r\n13\r\nsomencodedstr\r\n";
+        let function = Function::parse(raw.as_bytes().to_vec()).unwrap();
+        let same_fn_type = match function.function {
+            FunctionTypes::Describe => true,
+            _ => false,
+        };
+        assert_eq!(same_fn_type, true);
+
+        let same_entity_type = match function.entity {
+            EntityTypes::TXN => true,
+            _ => false,
+        };
+
+        assert_eq!(same_entity_type, true);
     }
 }
