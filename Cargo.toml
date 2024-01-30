@@ -4,14 +4,12 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-axum = "0.7.4"
 clap = "4.4.18"
-mio = { version = "0.8.10", features = ["net", "os-ext", "os-poll"] }
 rand = "0.8.5"
 serde = { version = "1.0.195", features = ["derive", "serde_derive"] }
 serde_json = "1.0.111"
 sled = "0.34.7"
-tokio = { version = "1.35.1", features = ["rt-multi-thread", "macros"] }
+tokio = { version = "1.35.1", features = ["rt-multi-thread", "macros", "net", "io-util"] }
 tower = { version = "0.4.13", features = ["util", "timeout"] }
 tracing = "0.1.40"
 tracing-subscriber = { version = "0.3", features = ["env-filter"] }

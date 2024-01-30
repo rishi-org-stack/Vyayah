@@ -1,17 +1,17 @@
 // finctl acc add --name=<name> --type=saving|emi|active
 //     --initial_balance=<initial_balance_amt>
 
-// findctl acc del <name>
+// finctl acc del <name>
 
-// findctl acc statement <name> --tail=<tail_count> --head=<head_count>
+// finctl acc statement <name> --tail=<tail_count> --head=<head_count>
 
-// findctl describe <acc>/<name>
+// finctl describe <acc>/<name>
 
-// findctl txn --name=<name> debit  --amt=<amount> --tax=1,2,3 --type=
+// finctl txn --name=<name> debit  --amt=<amount> --tax=1,2,3 --type=
 // <category of txn> --info=<description>
 
-// findctl txn --name=<name> refund  <txn_identifier>
-use clap::{arg, command, Arg, Command};
+// finctl txn --name=<name> refund  <txn_identifier>
+use clap::{arg, Arg, Command};
 
 pub fn input() -> Command {
     Command::new("finctl")

@@ -4,6 +4,7 @@ pub mod db;
 pub mod handler;
 pub mod id;
 pub mod model;
+pub mod protocol;
 pub mod service;
 use api::api;
 use clap::ArgMatches;
@@ -168,5 +169,5 @@ async fn main() {
     // let account_body = String::from_utf8(b).unwrap();
     // println!("{}", account_body)
 
-    api();
+    api().await.expect("msg");
 }
