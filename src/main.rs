@@ -6,11 +6,10 @@ pub mod id;
 pub mod model;
 pub mod protocol;
 pub mod service;
-use api::api;
+pub mod vyayah;
+use api::API;
 use clap::ArgMatches;
-use cli::input;
-use sled::{Config, Db};
-use std::io::Read;
+use protocol::response::{Response, ResponseType};
 
 use crate::{db::AccountDB, model::Account};
 fn handle_acc(subcmd: &ArgMatches, db: AccountDB) {
@@ -169,5 +168,13 @@ async fn main() {
     // let account_body = String::from_utf8(b).unwrap();
     // println!("{}", account_body)
 
-    api().await.expect("msg");
+    // api().await.expect("msg");
+
+    let response = Response::new(ResponseType::ERR, 110, "rishijhaoi".as_bytes().to_vec());
+    let encoded = response.to_vec();
+    println!("encoded   {:?}", encoded);
+    let expected = "ERR\r\n10\r\nrishijhaoi\r\n".as_bytes().to_vec();
+    println!("eexpected {:?}", expected);
+    let s = String::from_utf8(encoded).unwrap();
+    println!("{}", s)
 }
